@@ -16,13 +16,12 @@ function todo {
     switch ($AddRemove) {
         'a' {
             $updatedTodo = Add-TodoItem -TodoItems $todoItems -ItemToAdd $Item
-            $updatedTodo | Set-Content $Path
+            Set-TodoContent -TodoItems $updatedTodo -Path $Path
             todo -Path $Path
         }
         'r' {
             $updatedTodo = Remove-TodoItem -TodoItems $todoItems -ItemIndexToRemove $Item
-            if (!$updatedTodo) {Set-Content $Path -Value ""}
-            else {$updatedTodo | Set-Content $Path}
+            Set-TodoContent -TodoItems $updatedTodo -Path $Path
             todo -Path $Path
         }
         default {
@@ -30,6 +29,15 @@ function todo {
             else {Write-TodoItems -Items $todoItems}
         }
     }
+}
+
+function Set-TodoContent {
+    Param(
+        [string[]] $TodoItems,
+        [string] $Path
+    )
+    if (!$TodoItems) {Set-Content $Path -Value ""}
+    else {$TodoItems | Set-Content $Path}
 }
 
 function Remove-TodoItem {
