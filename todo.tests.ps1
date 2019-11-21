@@ -47,6 +47,11 @@ Describe 'todo' {
             todo r 1 -Path $testPath | Out-Null
             Get-Content $donePath | Should -HaveCount 1
         }
+        AfterAll {Get-ChildItem -Path $PSScriptRoot -Filter *.txt | Remove-Item}
     }
-    AfterAll {Get-ChildItem -Path $PSScriptRoot -Filter *.txt | Remove-Item}
+    Context 'done' {
+        It 'should note file not found if no done file' {
+            done -Path $testPath | Should -Be "done file not found in '$testPath'"
+        }
+    }
 }
