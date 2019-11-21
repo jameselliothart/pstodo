@@ -3,7 +3,7 @@ function todo {
         [ValidateSet('a','r')]
         [string] $AddRemove,
         [string] $Item,
-        [string] $Path = 'H:\todo.txt'
+        [string] $Path = "${HOME}/todo.txt"
     )
 
     if (!(Test-Path $Path)) {
@@ -60,7 +60,7 @@ function Write-TodoItems {
 function New-TodoCompleted {
     Param(
         [string] $Item,
-        [string] $Path = 'H:\todo.done.txt'
+        [string] $Path = "${HOME}/todo.done.txt"
     )
     $timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
     $entry = "[$timestamp] $Item"
@@ -70,7 +70,7 @@ function New-TodoCompleted {
 function done {
     Param(
         [int] $Tail = 10,
-        [string] $Path = 'H:\todo.done.txt'
+        [string] $Path = "${HOME}/todo.done.txt"
     )
     if (!(Test-Path $Path)) {return "done file not found in '$Path'"}
     Get-Content $Path -Tail $Tail
