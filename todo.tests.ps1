@@ -13,6 +13,12 @@ Describe 'todo' {
             Write-TodoItems $items | Should -Be "0. first", "1. second", "2. another"
         }
     }
+    Context 'Get-DonePath' {
+        It 'should return a path to a *.done.txt file' {
+            $path = 'some/path/to/todo.txt'
+            Get-DonePath -Path $path | Should -Be 'some/path/to/todo.done.txt'
+        }
+    }
     Context 'todo' {
         BeforeEach {
             Set-Content $testPath -Value $mockTodo -Force
