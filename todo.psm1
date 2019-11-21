@@ -76,4 +76,4 @@ function done {
     Get-Content $Path -Tail $Tail
 }
 
-Export-ModuleMember -Function todo, done
+# Export-ModuleMember -Function todo, done
