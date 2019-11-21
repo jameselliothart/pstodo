@@ -29,6 +29,12 @@ Describe 'todo' {
             $expected = "0. first", "1. another"
             todo r 1 -Path $testPath | Should -Be $expected
         }
+        It 'should remove the final item when only one item exists' {
+            $expected = "No todos in $testPath!"
+            todo r 0 -Path $testPath | Out-Null
+            todo r 0 -Path $testPath | Out-Null
+            todo r 0 -Path $testPath | Should -Be $expected
+        }
         It 'should write a removed item to the done file' {
             $donePath = Get-DonePath $testPath
             New-Item $donePath -Force
