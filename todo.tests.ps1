@@ -1,12 +1,11 @@
 Import-Module $PSScriptRoot\todo.psm1 -Force
 
-$testPath = "TestDrive:\todo.txt"
+$testPath = "$PSScriptRoot\todo.txt"
 
 $mockTodo = "first
 second
 another"
 
-InModuleScope todo { # lets us access the module's internal members
 Describe 'todo' {
     Context 'Write-TodoItems' {
         It 'should display indexed todo items' {
@@ -37,5 +36,5 @@ Describe 'todo' {
             Get-Content $donePath | Should -HaveCount 1
         }
     }
-}
+    AfterAll {Get-ChildItem -Path $PSScriptRoot -Filter *.txt | Remove-Item}
 }
