@@ -15,15 +15,12 @@ function todo {
 
     switch ($AddRemove) {
         'a' {
-            $Item, $todoItems | ForEach-Object {$updatedTodo += $_}
+            $updatedTodo = Add-TodoItem -TodoItems $todoItems -ItemToAdd $Item
             $updatedTodo | Set-Content $Path
             todo -Path $Path
         }
         'r' {
-            for ($i = 0; $i -lt $todoItems.Count; $i++) {
-                if ($i -ne $Item) {$updatedTodo += $todoItems[$i]}
-                else {New-TodoCompleted -Item $todoItems[$i] -Path (Get-DonePath $Path)}
-            }
+            $updatedTodo = Remove-TodoItem -TodoItems $todoItems -ItemIndexToRemove $Item
             if (!$updatedTodo) {Set-Content $Path -Value ""}
             else {$updatedTodo | Set-Content $Path}
             todo -Path $Path
@@ -33,6 +30,29 @@ function todo {
             else {Write-TodoItems -Items $todoItems}
         }
     }
+}
+
+function Remove-TodoItem {
+    Param(
+        [string[]] $TodoItems,
+        [string] $ItemIndexToRemove
+    )
+    $updatedTodo = @()
+    for ($i = 0; $i -lt $TodoItems.Count; $i++) {
+        if ($i -ne $ItemIndexToRemove) {$updatedTodo += $TodoItems[$i]}
+        else {New-TodoCompleted -Item $TodoItems[$i] -Path (Get-DonePath $Path)}
+    }
+    return $updatedTodo
+}
+
+function Add-TodoItem {
+    Param(
+        [string[]] $TodoItems,
+        [string] $ItemToAdd
+    )
+    $updatedTodo = @()
+    $ItemToAdd, $TodoItems | ForEach-Object {$updatedTodo += $_}
+    return $updatedTodo
 }
 
 function Get-DonePath {
