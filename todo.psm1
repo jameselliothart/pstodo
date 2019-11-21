@@ -6,12 +6,8 @@ function todo {
         [string] $Path = "${HOME}/todo.txt"
     )
 
-    if (!(Test-Path $Path)) {
-        New-Item $Path -ItemType File -Force | Out-Null
-        return "New todo file created in $Path"
-    }
+    Initialize-TodoItems -Path $Path
     [string[]] $todoItems = Get-Content $Path | Where-Object {$_} # ignore blank lines
-    $updatedTodo = @()
 
     switch ($AddRemove) {
         'a' {
@@ -28,6 +24,16 @@ function todo {
             if (!$todoItems) {"No todos in $Path!"}
             else {Write-TodoItems -Items $todoItems}
         }
+    }
+}
+
+function Initialize-TodoItems {
+    Param(
+        [string] $Path
+    )
+    if (!(Test-Path $Path)) {
+        New-Item $Path -ItemType File -Force | Out-Null
+        return "New todo file created in $Path"
     }
 }
 
