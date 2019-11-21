@@ -49,6 +49,15 @@ Describe 'todo' {
         }
         AfterAll {Get-ChildItem -Path $PSScriptRoot -Filter *.txt | Remove-Item}
     }
+    Context 'Get-DoneByDate' {
+        $DoneItems = '[2019-11-19 20:37:55] nineteen', '[2019-11-20 20:37:55] twenty', '[2019-11-21 20:37:55] twenty-one'
+        It 'should return done items from the specified year-month-day' {
+            Get-DoneByDate -Date '2019-11-20' -DoneItems $DoneItems | Should -Be '[2019-11-20 20:37:55] twenty'
+        }
+        It 'should return done items from the specified month-day' {
+            Get-DoneByDate -Date '11-20' -DoneItems $DoneItems | Should -Be '[2019-11-20 20:37:55] twenty'
+        }
+    }
     Context 'done' {
         It 'should note file not found if no done file' {
             done -Path $testPath | Should -Be "done file not found in '$testPath'"

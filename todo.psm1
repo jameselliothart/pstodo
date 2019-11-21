@@ -110,4 +110,14 @@ function done {
     Get-Content $Path -Tail $Tail
 }
 
+function Get-DoneByDate {
+    Param(
+        [string] $Date,
+        [string[]] $DoneItems
+    )
+    $regexDate = $Date.Replace('-','\-')
+    $matchString = "\[.*$regexDate.*\d{2}:\d{2}:\d{2}\].+"
+    $DoneItems | Where-Object {$_ -match $matchString}
+}
+
 # Export-ModuleMember -Function todo, done
