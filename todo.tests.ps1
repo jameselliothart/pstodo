@@ -6,9 +6,9 @@ $mockTodo = "first
 second
 another"
 
-$mockDone = "[2019-11-19 20:37:55] nineteen
-[2019-11-20 20:37:55] twenty
-[2019-11-21 20:37:55] twenty-one"
+$mockDone = "[$((Get-Date).AddDays(-2) | Get-Date -Format yyyy-MM-dd) 20:37:55] two days ago
+[$((Get-Date).AddDays(-1) | Get-Date -Format yyyy-MM-dd) 20:37:55] yesterday
+[$(Get-Date -Format yyyy-MM-dd) 20:37:55] today"
 
 Describe 'todo' {
     Context 'Write-TodoItems' {
@@ -72,7 +72,7 @@ Describe 'todo' {
         }
         It 'should return the specified Tail number of done items' {
             Set-Content $donePath -Value $mockDone -Force
-            done -Path $donePath -Tail 2 | Should -Be '[2019-11-20 20:37:55] twenty', '[2019-11-21 20:37:55] twenty-one'
+            done -Tail 2 -Path $donePath | Should -Be ($mockDone -split '\r?\n').Where({$_})[-2..-1]
         }
     }
 }
