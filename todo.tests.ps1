@@ -8,6 +8,7 @@ another"
 
 $mockDone = "[$((Get-Date).AddDays(-2) | Get-Date -Format yyyy-MM-dd) 20:37:55] two days ago
 [$((Get-Date).AddDays(-1) | Get-Date -Format yyyy-MM-dd) 20:37:55] yesterday
+[$((Get-Date).AddDays(-1) | Get-Date -Format yyyy-MM-dd) 20:37:55] yesterday as well
 [$(Get-Date -Format yyyy-MM-dd) 20:37:55] today"
 
 Describe 'todo' {
@@ -76,11 +77,11 @@ Describe 'todo' {
         }
         It 'should return the items done today' {
             Set-Content $donePath -Value $mockDone -Force
-            done today -Path $donePath | Should -Be ($mockDone -split '\r?\n').Where({$_})[-1]
+            done today -Path $donePath | Should -Be ($mockDone -split '\r?\n').Where({$_ -like '*today*'})
         }
         It 'should return the items done yesterday' {
             Set-Content $donePath -Value $mockDone -Force
-            done yesterday -Path $donePath | Should -Be ($mockDone -split '\r?\n').Where({$_})[-2]
+            done yesterday -Path $donePath | Should -Be ($mockDone -split '\r?\n').Where({$_ -like '*yesterday*'})
         }
     }
 }
