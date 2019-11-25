@@ -74,5 +74,13 @@ Describe 'todo' {
             Set-Content $donePath -Value $mockDone -Force
             done -Tail 2 -Path $donePath | Should -Be ($mockDone -split '\r?\n').Where({$_})[-2..-1]
         }
+        It 'should return the items done today' {
+            Set-Content $donePath -Value $mockDone -Force
+            done today -Path $donePath| Should -Be ($mockDone -split '\r?\n').Where({$_})[-1]
+        }
+        It 'should return the items done yesterday' {
+            Set-Content $donePath -Value $mockDone -Force
+            done yesterday -Path $donePath| Should -Be ($mockDone -split '\r?\n').Where({$_})[-2]
+        }
     }
 }

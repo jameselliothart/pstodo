@@ -103,13 +103,20 @@ function New-TodoCompleted {
 
 function done {
     Param(
+        [ValidateSet('yesterday', 'today')]
+        [string] $Specifier1,
         [ValidateRange(1, [int]::MaxValue)]
-        [int] $Tail = 10,
+        [int] $Tail = [int]::MaxValue,
         [string] $Path = "${HOME}/todo.done.txt"
     )
     if (!(Test-Path $Path)) {return "done file not found in '$Path'"}
     $doneItems = Get-Content $Path
-    $doneItems | select -Last $Tail
+    switch ($Specifier1) {
+        "yesterday" { $date = (Get-Date).AddDays(-1) | Get-Date -Format yyyy-MM-dd }
+        "today" { $date = Get-Date -Format yyyy-MM-dd }
+        default { $date = '.' }
+    }
+    Get-DoneByDate -Date $date -DoneItems $doneItems | Select-Object -Last $Tail
 }
 
 function Get-DoneByDate {
