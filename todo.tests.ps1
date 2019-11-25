@@ -6,6 +6,10 @@ $mockTodo = "first
 second
 another"
 
+$mockDone = "[2019-11-19 20:37:55] nineteen
+[2019-11-20 20:37:55] twenty
+[2019-11-21 20:37:55] twenty-one"
+
 Describe 'todo' {
     Context 'Write-TodoItems' {
         It 'should display indexed todo items' {
@@ -59,8 +63,16 @@ Describe 'todo' {
         }
     }
     Context 'done' {
+        $donePath = (Get-DonePath -Path $testPath)
+        AfterEach {
+            if (Test-Path $donePath) {Remove-Item $donePath}
+        }
         It 'should note file not found if no done file' {
             done -Path $testPath | Should -Be "done file not found in '$testPath'"
+        }
+        It 'should return the specified Tail number of done items' {
+            Set-Content $donePath -Value $mockDone -Force
+            done -Path $donePath -Tail 2 | Should -Be '[2019-11-20 20:37:55] twenty', '[2019-11-21 20:37:55] twenty-one'
         }
     }
 }
