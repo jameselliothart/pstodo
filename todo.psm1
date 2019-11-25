@@ -103,11 +103,13 @@ function New-TodoCompleted {
 
 function done {
     Param(
+        [ValidateRange(1, [int]::MaxValue)]
         [int] $Tail = 10,
         [string] $Path = "${HOME}/todo.done.txt"
     )
     if (!(Test-Path $Path)) {return "done file not found in '$Path'"}
-    Get-Content $Path -Tail $Tail
+    $doneItems = Get-Content $Path
+    $doneItems | select -Last $Tail
 }
 
 function Get-DoneByDate {
