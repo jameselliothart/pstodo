@@ -21,7 +21,7 @@ Describe 'todo' {
     Context 'Get-DonePath' {
         It 'should return a path to a *.done.txt file' {
             $path = 'some/path/to/todo.txt'
-            Get-DonePath -Path $path | Should -Be 'some/path/to/todo.done.txt'
+            (Get-DonePath -Path $path).Replace('\','/') | Should -Be 'some/path/to/todo.done.txt'
         }
     }
     Context 'todo' {
