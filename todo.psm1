@@ -1,9 +1,24 @@
+function Get-TodoPath {
+    Param(
+        $ConfigPath = "$PSScriptRoot/todoConfig.json"
+    )
+    if (Test-Path $ConfigPath) {
+        $content = Get-Content $ConfigPath -Raw
+        $todoConfig = ConvertFrom-Json $content -Depth 10
+        return $todoConfig.todoConfig.basePath
+    }
+    else {
+        Write-Verbose "Could not find $ConfigPath. Defaulting todo base path to $HOME"
+        return $HOME
+    }
+}
+
 function todo {
     Param(
         [ValidateSet('a','r')]
         [string] $AddRemove,
         [string] $Item,
-        [string] $Path = "${HOME}/todo.txt"
+        [string] $Path = "$(Get-TodoPath)/todo.txt"
     )
 
     Initialize-TodoItems -Path $Path
@@ -94,7 +109,7 @@ function Write-TodoItems {
 function New-TodoCompleted {
     Param(
         [string] $Item,
-        [string] $Path = "${HOME}/todo.done.txt"
+        [string] $Path = "$(Get-TodoPath)/todo.done.txt"
     )
     $timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
     $entry = "[$timestamp] $Item"
@@ -107,7 +122,7 @@ function done {
         [string] $Specifier1,
         [ValidateRange(1, [int]::MaxValue)]
         [int] $Tail = [int]::MaxValue,
-        [string] $Path = "${HOME}/todo.done.txt"
+        [string] $Path = "$(Get-TodoPath)/todo.done.txt"
     )
     if (!(Test-Path $Path)) {return "done file not found in '$Path'"}
     $doneItems = Get-Content $Path

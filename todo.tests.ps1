@@ -63,6 +63,16 @@ Describe 'todo' {
             Get-DoneByDate -Date '11-20' -DoneItems $DoneItems | Should -Be '[2019-11-20 20:37:55] twenty'
         }
     }
+    Context 'Get-TodoPath' {
+        It 'should default to $HOME when todoConfig.json is not found' {
+            Get-TodoPath | Should -Be $HOME
+        }
+        It 'should return the path specified in todoConfig.json' {
+            Set-Content todoConfig.temp.json -Value '{"todoConfig": {"basePath": "path/to/todo"}}' -Force
+            Get-TodoPath -ConfigPath todoConfig.temp.json | Should -Be "path/to/todo"
+        }
+        AfterAll {Get-ChildItem -Path $PSScriptRoot -Filter *.temp.json | Remove-Item}
+    }
     Context 'done' {
         $donePath = (Get-DonePath -Path $testPath)
         AfterEach {

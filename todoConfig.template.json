@@ -1,0 +1,6 @@
+{
+    "todoConfig":
+    {
+        "basePath": "rename to todoConfig.json and specify /some/path here"
+    }
+}
