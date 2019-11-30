@@ -4,7 +4,7 @@ function Get-TodoPath {
     )
     if (Test-Path $ConfigPath) {
         $content = Get-Content $ConfigPath -Raw
-        $todoConfig = ConvertFrom-Json $content -Depth 10
+        $todoConfig = ConvertFrom-Json $content
         return $todoConfig.todoConfig.basePath
     }
     else {
