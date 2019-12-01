@@ -149,4 +149,9 @@ function Get-DoneByDate {
     $DoneItems | Where-Object {$_ -match $matchString}
 }
 
+function Get-DateFromDoneItem {
+    Param([string] $DoneItem)
+    [regex]::Match($DoneItem,'^\[(?<datetime>.+)\]').Groups['datetime'].Value
+}
+
 # Export-ModuleMember -Function todo, done

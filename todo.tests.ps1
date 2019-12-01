@@ -58,6 +58,10 @@ Describe 'todo' {
         }
         AfterAll {Get-ChildItem -Path $PSScriptRoot -Filter *.txt | Remove-Item}
     }
+    Context 'Get-DateFromDoneItem' {
+        $doneItem = '[2019-11-19 20:37:55] nineteen'
+        Get-DateFromDoneItem -DoneItem $doneItem | Should -Be '2019-11-19 20:37:55'
+    }
     Context 'Get-DoneByDate' {
         $DoneItems = ($mockDone -split '\r?\n')
         It 'should return done items from the specified year-month-day' {
