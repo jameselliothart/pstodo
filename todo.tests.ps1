@@ -6,7 +6,11 @@ $mockTodo = "first
 second
 another"
 
-$mockDone = "[$((Get-Date).AddDays(-2) | Get-Date -Format yyyy-MM-dd) 20:37:55] two days ago
+$mockDone = "[2019-01-09 12:00:00] second week of the year
+[2019-11-19 20:37:55] nineteen
+[2019-11-20 20:37:55] twenty
+[2019-11-21 20:37:55] twenty-one
+[$((Get-Date).AddDays(-2) | Get-Date -Format yyyy-MM-dd) 20:37:55] two days ago
 [$((Get-Date).AddDays(-1) | Get-Date -Format yyyy-MM-dd) 20:37:55] yesterday
 [$((Get-Date).AddDays(-1) | Get-Date -Format yyyy-MM-dd) 20:37:55] yesterday as well
 [$(Get-Date -Format yyyy-MM-dd) 20:37:55] today"
@@ -55,7 +59,7 @@ Describe 'todo' {
         AfterAll {Get-ChildItem -Path $PSScriptRoot -Filter *.txt | Remove-Item}
     }
     Context 'Get-DoneByDate' {
-        $DoneItems = '[2019-11-19 20:37:55] nineteen', '[2019-11-20 20:37:55] twenty', '[2019-11-21 20:37:55] twenty-one'
+        $DoneItems = ($mockDone -split '\r?\n')
         It 'should return done items from the specified year-month-day' {
             Get-DoneByDate -Date '2019-11-20' -DoneItems $DoneItems | Should -Be '[2019-11-20 20:37:55] twenty'
         }
