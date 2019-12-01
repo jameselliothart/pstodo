@@ -120,12 +120,12 @@ function done {
     [CmdletBinding(DefaultParameterSetName = 'TailNumber')]
     Param(
         [Parameter(Position = 0, ParameterSetName = 'NaturalLanguage')]
-        [ValidateSet('yesterday', 'today', 'last')]
+        [ValidateSet('yesterday', 'today', 'last', 'this')]
         [string] $Specifier1,
 
         [Parameter(Position = 1, ParameterSetName = 'NaturalLanguage')]
         [ValidateSet('week')]
-        [string] $Specifier2,
+        [string] $Specifier2 = 'week',
 
         [Parameter(Position = 0, ParameterSetName = 'TailNumber')]
         [ValidateRange(1, [int]::MaxValue)]
@@ -139,10 +139,11 @@ function done {
     switch ($Specifier1) {
         "yesterday" { $params.Date = (Get-Date).AddDays(-1) | Get-Date -Format yyyy-MM-dd }
         "today" { $params.Date = Get-Date -Format yyyy-MM-dd }
-        "last" {
+        {$_ -in "this","last"} {
+            $addDays = @{this = 0; last = -7}
             switch ($Specifier2) {
-                "week" { $params.WeekNumber = [int]((Get-Date).AddDays(-7) | Get-Date -UFormat %V) }
-                Default { throw "Must specify valid Specifier2 parameter" }
+                "week" { $params.WeekNumber = [int]((Get-Date).AddDays($addDays[$Specifier1]) | Get-Date -UFormat %V) }
+                Default { throw "'$Specifier2' is not a valid Specifier2 parameter" }
             }
         }
         default { $params.Date = '.' }

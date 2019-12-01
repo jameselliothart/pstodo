@@ -115,5 +115,17 @@ Describe 'todo' {
             Set-Content $donePath -Value $mockDone -Force
             done last week -Path $donePath | Should -Be ($mockDone -split '\r?\n').Where({$_ -like '*last week*'})
         }
+        It 'should return the items done this week' {
+            $weekNumToday = Get-Date | Get-Date -UFormat %V
+            $weekNumTwoDaysAgo = (Get-Date).AddDays(-2) | Get-Date -UFormat %V
+            if ($weekNumTwoDaysAgo -ne $weekNumToday) {
+                Set-ItResult -Skipped -Because "this is only a valid test when at least two days into the current week"
+            }
+            else {
+                Set-Content $donePath -Value $mockDone -Force
+                $expected = {($_ -like '*today*') -or ($_ -like '*yesterday*') -or ($_ -like '*two days ago*')}
+                done this week -Path $donePath | Should -Be ($mockDone -split '\r?\n').Where($expected)
+            }
+        }
     }
 }
