@@ -141,12 +141,25 @@ function done {
 
 function Get-DoneByDate {
     Param(
+        [Parameter(Position = 0, ParameterSetName = 'Date')]
         [string] $Date,
+        [Parameter(Position = 0, ParameterSetName = 'WeekNumber')]
+        [ValidateRange(1, 52)]
+        [int] $WeekNumber,
         [string[]] $DoneItems
     )
-    $regexDate = $Date.Replace('-','\-')
-    $matchString = "\[.*$regexDate.*\d{2}:\d{2}:\d{2}\].+"
-    $DoneItems | Where-Object {$_ -match $matchString}
+    switch ($PSCmdlet.ParameterSetName) {
+        'Date' {
+            $regexDate = $Date.Replace('-','\-')
+            $matchString = "^\[.*$regexDate.*\d{2}:\d{2}:\d{2}\].+"
+            $DoneItems | Where-Object {$_ -match $matchString}
+        }
+        'WeekNumber' {
+            $formattedWeekNumber = "{0:00}" -f $WeekNumber
+            $DoneItems | Where-Object {(Get-DateFromDoneItem $_ | Get-Date -UFormat %V) -eq $formattedWeekNumber}
+        }
+        Default { throw "Parameter set not recognized: $($PSCmdlet.ParameterSetName)" }
+    }
 }
 
 function Get-DateFromDoneItem {
