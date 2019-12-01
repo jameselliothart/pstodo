@@ -7,9 +7,9 @@ second
 another"
 
 $mockDone = "[2019-01-09 12:00:00] second week of the year
-[2019-11-19 20:37:55] nineteen
-[2019-11-20 20:37:55] twenty
-[2019-11-21 20:37:55] twenty-one
+[2019-11-11 20:37:55] eleven
+[2019-11-12 20:37:55] twelve
+[2019-11-13 20:37:55] thirteen
 [$((Get-Date).AddDays(-2) | Get-Date -Format yyyy-MM-dd) 20:37:55] two days ago
 [$((Get-Date).AddDays(-1) | Get-Date -Format yyyy-MM-dd) 20:37:55] yesterday
 [$((Get-Date).AddDays(-1) | Get-Date -Format yyyy-MM-dd) 20:37:55] yesterday as well
@@ -65,10 +65,10 @@ Describe 'todo' {
     Context 'Get-DoneByDate' {
         $DoneItems = ($mockDone -split '\r?\n')
         It 'should return done items from the specified year-month-day' {
-            Get-DoneByDate -Date '2019-11-20' -DoneItems $DoneItems | Should -Be '[2019-11-20 20:37:55] twenty'
+            Get-DoneByDate -Date '2019-11-11' -DoneItems $DoneItems | Should -Be $DoneItems.Where({$_ -like '*eleven*'})
         }
         It 'should return done items from the specified month-day' {
-            Get-DoneByDate -Date '11-20' -DoneItems $DoneItems | Should -Be '[2019-11-20 20:37:55] twenty'
+            Get-DoneByDate -Date '11-11' -DoneItems $DoneItems | Should -Be $DoneItems.Where({$_ -like '*eleven*'})
         }
         It 'should return done items from the specified week number' {
             Get-DoneByDate -WeekNumber 2 -DoneItems $DoneItems | Should -Be '[2019-01-09 12:00:00] second week of the year'
