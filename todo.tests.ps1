@@ -10,6 +10,8 @@ $mockDone = "[2019-01-09 12:00:00] second week of the year
 [2019-11-11 20:37:55] eleven
 [2019-11-12 20:37:55] twelve
 [2019-11-13 20:37:55] thirteen
+[$((Get-Date).AddDays(-7) | Get-Date -Format yyyy-MM-dd) 20:37:55] last week one
+[$((Get-Date).AddDays(-7) | Get-Date -Format yyyy-MM-dd) 20:37:55] last week two
 [$((Get-Date).AddDays(-2) | Get-Date -Format yyyy-MM-dd) 20:37:55] two days ago
 [$((Get-Date).AddDays(-1) | Get-Date -Format yyyy-MM-dd) 20:37:55] yesterday
 [$((Get-Date).AddDays(-1) | Get-Date -Format yyyy-MM-dd) 20:37:55] yesterday as well
@@ -108,6 +110,10 @@ Describe 'todo' {
         It 'should return the items done yesterday' {
             Set-Content $donePath -Value $mockDone -Force
             done yesterday -Path $donePath | Should -Be ($mockDone -split '\r?\n').Where({$_ -like '*yesterday*'})
+        }
+        It 'should return the items done last week' {
+            Set-Content $donePath -Value $mockDone -Force
+            done last week -Path $donePath | Should -Be ($mockDone -split '\r?\n').Where({$_ -like '*last week*'})
         }
     }
 }
