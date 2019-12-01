@@ -117,11 +117,16 @@ function New-TodoCompleted {
 }
 
 function done {
+    [CmdletBinding(DefaultParameterSetName = 'TailNumber')]
     Param(
+        [Parameter(Position = 0, ParameterSetName = 'NaturalLanguage')]
         [ValidateSet('yesterday', 'today')]
         [string] $Specifier1,
+
+        [Parameter(Position = 0, ParameterSetName = 'TailNumber')]
         [ValidateRange(1, [int]::MaxValue)]
         [int] $Tail = [int]::MaxValue,
+
         [string] $Path = "$(Get-TodoPath)/todo.done.txt"
     )
     if (!(Test-Path $Path)) {return "done file not found in '$Path'"}

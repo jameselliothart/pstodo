@@ -81,9 +81,14 @@ Describe 'todo' {
         It 'should note file not found if no done file' {
             done -Path $testPath | Should -Be "done file not found in '$testPath'"
         }
+        It 'should return all done items by default' {
+            Set-Content $donePath -Value $mockDone -Force
+            done -Path $donePath | Should -Be ($mockDone -split '\r?\n')
+        }
         It 'should return the specified Tail number of done items' {
             Set-Content $donePath -Value $mockDone -Force
             done -Tail 2 -Path $donePath | Should -Be ($mockDone -split '\r?\n').Where({$_})[-2..-1]
+            done 2 -Path $donePath | Should -Be ($mockDone -split '\r?\n').Where({$_})[-2..-1]
         }
         It 'should return the items done today' {
             Set-Content $donePath -Value $mockDone -Force
