@@ -81,24 +81,24 @@ Describe 'done' {
         }
         It 'should return all done items by default' {
             Set-Content $donePath -Value $mockDone -Force
-            done -Path $donePath | Should -Be ($mockDone -split '\r?\n')
+            done -Path $donePath | Should -Be $DoneItems
         }
         It 'should return the specified Tail number of done items' {
             Set-Content $donePath -Value $mockDone -Force
-            done -Tail 2 -Path $donePath | Should -Be ($mockDone -split '\r?\n').Where({$_})[-2..-1]
-            done 2 -Path $donePath | Should -Be ($mockDone -split '\r?\n').Where({$_})[-2..-1]
+            done -Tail 2 -Path $donePath | Should -Be $DoneItems.Where({$_})[-2..-1]
+            done 2 -Path $donePath | Should -Be $DoneItems.Where({$_})[-2..-1]
         }
         It 'should return the items done today' {
             Set-Content $donePath -Value $mockDone -Force
-            done today -Path $donePath | Should -Be ($mockDone -split '\r?\n').Where({$_ -like '*today*'})
+            done today -Path $donePath | Should -Be $DoneItems.Where({$_ -like '*today*'})
         }
         It 'should return the items done yesterday' {
             Set-Content $donePath -Value $mockDone -Force
-            done yesterday -Path $donePath | Should -Be ($mockDone -split '\r?\n').Where({$_ -like '*yesterday*'})
+            done yesterday -Path $donePath | Should -Be $DoneItems.Where({$_ -like '*yesterday*'})
         }
         It 'should return the items done last week' -Skip {
             Set-Content $donePath -Value $mockDone -Force
-            done last week -Path $donePath | Should -Be ($mockDone -split '\r?\n').Where({$_ -like '*last week*'})
+            done last week -Path $donePath | Should -Be $DoneItems.Where({$_ -like '*last week*'})
         }
         It 'should return the items done this week' {
             $weekNumToday = Get-Date | Get-Date -UFormat %V
@@ -109,12 +109,12 @@ Describe 'done' {
             else {
                 Set-Content $donePath -Value $mockDone -Force
                 $expected = {($_ -like '*today*') -or ($_ -like '*yesterday*') -or ($_ -like '*two days ago*')}
-                done this week -Path $donePath | Should -Be ($mockDone -split '\r?\n').Where($expected)
+                done this week -Path $donePath | Should -Be $DoneItems.Where($expected)
             }
         }
         It 'should return the items done last month' {
             Set-Content $donePath -Value $mockDone -Force
-            done last month -Path $donePath | Should -Be ($mockDone -split '\r?\n').Where({$_ -like '*last month*'})
+            done last month -Path $donePath | Should -Be $DoneItems.Where({$_ -like '*last month*'})
         }
     }
 }
