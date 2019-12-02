@@ -146,9 +146,12 @@ function done {
         "yesterday" { $params.Date = (Get-Date).AddDays(-1) | Get-Date -Format yyyy-MM-dd }
         "today" { $params.Date = Get-Date -Format yyyy-MM-dd }
         {$_ -in "this","last"} {
-            $addDays = @{this = 0; last = -7}
+            $addTime = @{this = @{week = 0}; last = @{week = -7}}
             switch ($Specifier2) {
-                "week" { $params.WeekNumber = [int]((Get-Date).AddDays($addDays[$Specifier1]) | Get-Date -UFormat %V) }
+                "week" { 
+                    $date = (Get-Date).AddDays($addTime[$Specifier1][$Specifier2])
+                    $params.WeekNumber = [int]($date | Get-Date -UFormat %V)
+                }
                 Default { throw "'$Specifier2' is not a valid Specifier2 parameter" }
             }
         }
