@@ -130,7 +130,7 @@ function done {
         [string] $Specifier1,
 
         [Parameter(Position = 1, ParameterSetName = 'NaturalLanguage')]
-        [ValidateSet('week')]
+        [ValidateSet('week', 'month')]
         [string] $Specifier2 = 'week',
 
         [Parameter(Position = 0, ParameterSetName = 'TailNumber')]
@@ -146,11 +146,17 @@ function done {
         "yesterday" { $params.Date = (Get-Date).AddDays(-1) | Get-Date -Format yyyy-MM-dd }
         "today" { $params.Date = Get-Date -Format yyyy-MM-dd }
         {$_ -in "this","last"} {
-            $addTime = @{this = @{week = 0}; last = @{week = -7}}
+            $addTime = @{this = @{week = 0; month = 0}; last = @{week = -7; month = -1}}
+            $date = @{
+                week = (Get-Date).AddDays($addTime[$Specifier1][$Specifier2])
+                month = (Get-Date).AddMonths($addTime[$Specifier1][$Specifier2])
+            }
             switch ($Specifier2) {
                 "week" { 
-                    $date = (Get-Date).AddDays($addTime[$Specifier1][$Specifier2])
-                    $params.WeekNumber = [int]($date | Get-Date -UFormat %V)
+                    $params.WeekNumber = [int]($date[$Specifier2] | Get-Date -UFormat %V)
+                }
+                "month" {
+                    $params.Date = $date[$Specifier2] | Get-Date -Format yyyy-MM-dd
                 }
                 Default { throw "'$Specifier2' is not a valid Specifier2 parameter" }
             }

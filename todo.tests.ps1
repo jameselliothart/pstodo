@@ -10,6 +10,7 @@ $mockDone = "[2019-01-09 12:00:00] second week of the year
 [2019-11-11 20:37:55] eleven
 [2019-11-12 20:37:55] twelve
 [2019-11-13 20:37:55] thirteen
+[$((Get-Date).AddMonths(-1) | Get-Date -Format yyyy-MM-dd) 20:37:55] last month
 [$((Get-Date).AddDays(-7) | Get-Date -Format yyyy-MM-dd) 20:37:55] last week one
 [$((Get-Date).AddDays(-7) | Get-Date -Format yyyy-MM-dd) 20:37:55] last week two
 [$((Get-Date).AddDays(-2) | Get-Date -Format yyyy-MM-dd) 20:37:55] two days ago
@@ -147,6 +148,10 @@ Describe 'todo' {
                 $expected = {($_ -like '*today*') -or ($_ -like '*yesterday*') -or ($_ -like '*two days ago*')}
                 done this week -Path $donePath | Should -Be ($mockDone -split '\r?\n').Where($expected)
             }
+        }
+        It 'should return the items done last month' {
+            Set-Content $donePath -Value $mockDone -Force
+            done last month -Path $donePath | Should -Be ($mockDone -split '\r?\n').Where({$_ -like '*last month*'})
         }
     }
     Context 'New-TodoCompleted' {
