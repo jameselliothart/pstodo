@@ -18,6 +18,14 @@ $mockDone = "[2019-01-09 12:00:00] second week of the year
 [$(Get-Date -Format yyyy-MM-dd) 20:37:55] today"
 
 Describe 'todo' {
+    Context 'Initialize-TodoItems' {
+        $testInitializePath = "$PSScriptRoot/deleteme.txt"
+        AfterEach {Get-ChildItem -Filter deleteme.txt | Remove-Item}
+        It 'should create a file in the specified path' {
+            Initialize-TodoItems -Path $testInitializePath
+            Test-Path $testInitializePath | Should -Be $true
+        }
+    }
     Context 'Write-TodoItems' {
         It 'should display indexed todo items' {
             $items = $mockTodo.Split().Where({$_})
