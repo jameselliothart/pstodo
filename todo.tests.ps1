@@ -102,9 +102,11 @@ Describe 'todo' {
         $donePath = (Get-DonePath -Path $testPath)
         AfterEach {
             if (Test-Path $donePath) {Remove-Item $donePath}
+            Get-ChildItem -Filter todoConfig.json | Remove-Item
         }
         It 'should note file not found if no done file' {
-            done -Path $testPath | Should -Be "done file not found in '$testPath'"
+            New-TempTodoConfig -BasePath (Split-Path $testPath)
+            done | Should -Be "done file not found in '$donePath'"
         }
         It 'should return all done items by default' {
             Set-Content $donePath -Value $mockDone -Force
