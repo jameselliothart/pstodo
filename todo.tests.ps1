@@ -45,6 +45,13 @@ Describe 'todo' {
     Context 'todo' {
         BeforeEach {
             Set-Content $testPath -Value $mockTodo -Force
+            Get-ChildItem -Filter todoConfig.json | Remove-Item
+        }
+        It 'should create a todo file when one is not found' {
+            New-TempTodoConfig -BasePath (Split-Path $testPath)
+            Remove-Item $testPath
+            todo | Should -Be @("New todo file created in $testPath", "No todos in $testPath!")
+            Test-Path $testPath | Should -Be $true
         }
         It 'should display todo items when a/r not specified' {
             $expected = "0. first", "1. second", "2. another"
