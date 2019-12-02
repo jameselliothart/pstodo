@@ -10,14 +10,14 @@ $mockDone = "[2019-01-09 12:00:00] second week of the year
 [2019-11-11 20:37:55] eleven
 [2019-11-12 20:37:55] twelve
 [2019-11-13 20:37:55] thirteen
-[$((Get-Date).AddMonths(-1) | Get-Date -Format yyyy-MM-dd) 20:37:55] last month
-[$((Get-Date).AddDays(-7) | Get-Date -Format yyyy-MM-dd) 20:37:55] last week one
-[$((Get-Date).AddDays(-7) | Get-Date -Format yyyy-MM-dd) 20:37:55] last week two
-[$((Get-Date).AddDays(-2) | Get-Date -Format yyyy-MM-dd) 20:37:55] two days ago
 [$((Get-Date).AddDays(-1) | Get-Date -Format yyyy-MM-dd) 20:37:55] yesterday
 [$((Get-Date).AddDays(-1) | Get-Date -Format yyyy-MM-dd) 20:37:55] yesterday as well
 [$(Get-Date -Format yyyy-MM-dd) 20:37:55] today"
 $DoneItems = ($mockDone -split '\r?\n')
+$mockDoneDateVariant = "[$((Get-Date).AddMonths(-1) | Get-Date -Format yyyy-MM-dd) 20:37:55] last month
+[$((Get-Date).AddDays(-7) | Get-Date -Format yyyy-MM-dd) 20:37:55] last week one
+[$((Get-Date).AddDays(-7) | Get-Date -Format yyyy-MM-dd) 20:37:55] last week two"
+$DoneItemsDateVariant = ($mockDoneDateVariant -split '\r?\n')
 
 function New-TempTodoConfig ([string] $BasePath = (Split-Path $testPath)) {
     Set-Content todoConfig.json -Value "{'todoConfig': {'basePath': '$BasePath'}}" -Force
@@ -25,22 +25,16 @@ function New-TempTodoConfig ([string] $BasePath = (Split-Path $testPath)) {
 
 Describe 'todo' {
     Context 'new todo file' {
-        BeforeEach {
-            New-TempTodoConfig -BasePath (Split-Path $testPath)
-        }
+        BeforeEach {New-TempTodoConfig -BasePath (Split-Path $testPath)}
+        AfterEach {Get-ChildItem -Filter todoConfig.json | Remove-Item}
         It 'should create a todo file when one is not found' {
             todo | Should -Be @("New todo file created in $testPath", "No todos in $testPath!")
             Test-Path $testPath | Should -Be $true
         }
-        AfterEach {
-            Get-ChildItem -Filter todoConfig.json | Remove-Item
-        }
     }
     Context 'existing todo file commands' {
-        BeforeEach {
-            # reset the todo.txt file contents
-            Set-Content $testPath -Value $mockTodo -Force
-        }
+        BeforeEach {Set-Content $testPath -Value $mockTodo -Force}
+        AfterEach {Get-ChildItem -Filter todo*.txt | Remove-Item}
         It 'should display todo items when a/r not specified' {
             $expected = "0. first", "1. second", "2. another"
             todo -Path $testPath | Should -Be $expected
@@ -64,57 +58,54 @@ Describe 'todo' {
             todo r 1 -Path $testPath | Out-Null
             Get-Content $donePath | Should -HaveCount 1
         }
-        AfterEach {Get-ChildItem -Filter todo*.txt | Remove-Item}
     }
 }
 
 Describe 'done' {
-    Context 'done' {
-        $donePath = (Get-DonePath -Path $testPath)
-        AfterEach {
-            if (Test-Path $donePath) {Remove-Item $donePath}
-            Get-ChildItem -Filter todoConfig.json | Remove-Item
-        }
+    $donePath = (Get-DonePath -Path $testPath)
+    Context 'no done file' {
+        BeforeEach {New-TempTodoConfig -BasePath (Split-Path $testPath)}
+        AfterEach {Get-ChildItem -Filter todoConfig.json | Remove-Item}
         It 'should note file not found if no done file' {
-            New-TempTodoConfig -BasePath (Split-Path $testPath)
             done | Should -Be "done file not found in '$donePath'"
         }
+    }
+    Context 'date invariant' {
+        BeforeEach {Set-Content $donePath -Value $mockDone -Force}
+        AfterEach {if (Test-Path $donePath) {Remove-Item $donePath}}
         It 'should return all done items by default' {
-            Set-Content $donePath -Value $mockDone -Force
             done -Path $donePath | Should -Be $DoneItems
         }
         It 'should return the specified Tail number of done items' {
-            Set-Content $donePath -Value $mockDone -Force
             done -Tail 2 -Path $donePath | Should -Be $DoneItems.Where({$_})[-2..-1]
             done 2 -Path $donePath | Should -Be $DoneItems.Where({$_})[-2..-1]
         }
         It 'should return the items done today' {
-            Set-Content $donePath -Value $mockDone -Force
             done today -Path $donePath | Should -Be $DoneItems.Where({$_ -like '*today*'})
         }
         It 'should return the items done yesterday' {
-            Set-Content $donePath -Value $mockDone -Force
             done yesterday -Path $donePath | Should -Be $DoneItems.Where({$_ -like '*yesterday*'})
         }
-        It 'should return the items done last week' -Skip {
-            Set-Content $donePath -Value $mockDone -Force
-            done last week -Path $donePath | Should -Be $DoneItems.Where({$_ -like '*last week*'})
+    }
+    Context 'date variant' {
+        BeforeEach {Set-Content $donePath -Value $mockDoneDateVariant -Force}
+        AfterEach {if (Test-Path $donePath) {Remove-Item $donePath}}
+        It 'should return the items done last week' {
+            done last week -Path $donePath | Should -Be $DoneItemsDateVariant.Where({$_ -like '*last week*'})
         }
-        It 'should return the items done this week' {
+        It 'should return the items done this week' -Skip {
             $weekNumToday = Get-Date | Get-Date -UFormat %V
             $weekNumTwoDaysAgo = (Get-Date).AddDays(-2) | Get-Date -UFormat %V
             if ($weekNumTwoDaysAgo -ne $weekNumToday) {
                 Set-ItResult -Skipped -Because "this is only a valid test when at least two days into the current week"
             }
             else {
-                Set-Content $donePath -Value $mockDone -Force
                 $expected = {($_ -like '*today*') -or ($_ -like '*yesterday*') -or ($_ -like '*two days ago*')}
-                done this week -Path $donePath | Should -Be $DoneItems.Where($expected)
+                done this week -Path $donePath | Should -Be $DoneItemsDateVariant.Where($expected)
             }
         }
         It 'should return the items done last month' {
-            Set-Content $donePath -Value $mockDone -Force
-            done last month -Path $donePath | Should -Be $DoneItems.Where({$_ -like '*last month*'})
+            done last month -Path $donePath | Should -Be $DoneItemsDateVariant.Where({$_ -like '*last month*'})
         }
     }
 }
