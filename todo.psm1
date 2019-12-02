@@ -118,8 +118,8 @@ function New-TodoCompleted {
         return $entry
     }
     else {
-    Add-Content -Value $entry -Path $Path
-}
+        Add-Content -Value $entry -Path $Path
+    }
 }
 
 function done {
