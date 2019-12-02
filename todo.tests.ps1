@@ -17,6 +17,10 @@ $mockDone = "[2019-01-09 12:00:00] second week of the year
 [$((Get-Date).AddDays(-1) | Get-Date -Format yyyy-MM-dd) 20:37:55] yesterday as well
 [$(Get-Date -Format yyyy-MM-dd) 20:37:55] today"
 
+function New-TempTodoConfig ([string] $BasePath = (Split-Path $testPath)) {
+    Set-Content todoConfig.json -Value "{'todoConfig': {'basePath': '$BasePath'}}" -Force
+}
+
 Describe 'todo' {
     Context 'Initialize-TodoItems' {
         $testInitializePath = "$PSScriptRoot/deleteme.txt"
