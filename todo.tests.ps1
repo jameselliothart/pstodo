@@ -1,6 +1,6 @@
-Import-Module $PSScriptRoot\todo.psm1 -Force
+Import-Module $PSScriptRoot/todo.psm1 -Force
 
-$testPath = "$PSScriptRoot\todo.txt"
+$testPath = "$PSScriptRoot/todo.txt"
 
 $mockTodo = "first
 second
