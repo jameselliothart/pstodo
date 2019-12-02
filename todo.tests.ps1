@@ -128,4 +128,13 @@ Describe 'todo' {
             }
         }
     }
+    Context 'New-TodoCompleted' {
+        AfterEach {Get-ChildItem -Filter todoConfig.json | Remove-Item}
+        It 'should return a timestamped todo item' {
+            New-TempTodoConfig -BasePath (Split-Path $testPath)
+            $item = 'a todo item'
+            $match = "^\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\] $item"
+            New-TodoCompleted -Item $item -WhatIf | Should -MatchExactly $match
+        }
+    }
 }

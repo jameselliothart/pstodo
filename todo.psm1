@@ -109,11 +109,17 @@ function Write-TodoItems {
 function New-TodoCompleted {
     Param(
         [string] $Item,
-        [string] $Path = "$(Get-TodoPath)/todo.done.txt"
+        [string] $Path = "$(Get-TodoPath)/todo.done.txt",
+        [switch] $WhatIf
     )
     $timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
     $entry = "[$timestamp] $Item"
+    if ($WhatIf.IsPresent) {
+        return $entry
+    }
+    else {
     Add-Content -Value $entry -Path $Path
+}
 }
 
 function done {
