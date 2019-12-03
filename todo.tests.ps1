@@ -15,6 +15,7 @@ $mockDone = "[2019-01-09 12:00:00] second week of the year
 [$(Get-Date -Format yyyy-MM-dd) 20:37:55] today"
 $DoneItems = ($mockDone -split '\r?\n')
 $mockDoneDateVariant = "[$((Get-Date).AddMonths(-1) | Get-Date -Format yyyy-MM-dd) 20:37:55] last month
+[$((Get-Date).AddDays(-14) | Get-Date -Format yyyy-MM-dd) 20:37:55] two weeks ago
 [$((Get-Date).AddDays(-7) | Get-Date -Format yyyy-MM-dd) 20:37:55] last week one
 [$((Get-Date).AddDays(-7) | Get-Date -Format yyyy-MM-dd) 20:37:55] last week two"
 $DoneItemsDateVariant = ($mockDoneDateVariant -split '\r?\n')
@@ -135,6 +136,11 @@ Describe "Utility Functions" {
         }
         It 'should return done items from the specified week number' {
             Get-DoneByDate -WeekNumber 2 -DoneItems $DoneItems | Should -Be '[2019-01-09 12:00:00] second week of the year'
+        }
+        It 'should return done items done since the specified week number' {
+            $twoWeeksAgo = [int]((Get-Date).AddDays(-14) | Get-Date -UFormat %V)
+            Get-DoneByDate -DoneSince -WeekNumber $twoWeeksAgo -DoneItems $DoneItemsDateVariant |
+                Should -Be $DoneItemsDateVariant.Where({($_ -like "*last week*") -or ($_ -like "*two weeks ago*")})
         }
     }
     Context 'Get-TodoPath' {

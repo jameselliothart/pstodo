@@ -173,6 +173,7 @@ function Get-DoneByDate {
         [Parameter(Position = 0, ParameterSetName = 'WeekNumber')]
         [ValidateRange(1, 52)]
         [int] $WeekNumber,
+        [switch] $DoneSince,
         [string[]] $DoneItems
     )
     $parameterSet = $PSCmdlet.ParameterSetName
@@ -183,8 +184,11 @@ function Get-DoneByDate {
             $DoneItems | Where-Object {$_ -match $matchString}
         }
         'WeekNumber' {
-            $formattedWeekNumber = "{0:00}" -f $WeekNumber
-            $DoneItems | Where-Object {(Get-DateFromDoneItem $_ | Get-Date -UFormat %V) -eq $formattedWeekNumber}
+            $where = (
+                {[int](Get-DateFromDoneItem $_ | Get-Date -UFormat %V) -eq $WeekNumber},
+                {[int](Get-DateFromDoneItem $_ | Get-Date -UFormat %V) -ge $WeekNumber}
+            )
+            $DoneItems | Where-Object $where[$DoneSince.IsPresent]
         }
         Default { throw "Parameter set not recognized: $parameterSet" }
     }
