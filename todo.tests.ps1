@@ -59,6 +59,11 @@ Describe 'todo' {
             todo r 1 -Path $testPath | Out-Null
             Get-Content $donePath | Should -HaveCount 1
         }
+        It 'should not write the removed item to the done file when -Purge specified' {
+            $donePath = Get-DonePath $testPath
+            todo r 1 -Path $testPath -Purge | Out-Null
+            Test-Path $donePath | Should -Be $false
+        }
     }
 }
 

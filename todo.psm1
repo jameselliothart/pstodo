@@ -18,6 +18,7 @@ function todo {
         [ValidateSet('a','r')]
         [string] $AddRemove,
         [string] $Item,
+        [switch] $Purge,
         [string] $Path = "$(Get-TodoPath)/todo.txt"
     )
 
@@ -31,7 +32,7 @@ function todo {
             todo -Path $Path
         }
         'r' {
-            $updatedTodo = Remove-TodoItem -TodoItems $todoItems -ItemIndexToRemove $Item
+            $updatedTodo = Remove-TodoItem -TodoItems $todoItems -ItemIndexToRemove $Item -Purge:$Purge
             Set-TodoContent -TodoItems $updatedTodo -Path $Path
             todo -Path $Path
         }
@@ -64,12 +65,15 @@ function Set-TodoContent {
 function Remove-TodoItem {
     Param(
         [string[]] $TodoItems,
-        [string] $ItemIndexToRemove
+        [string] $ItemIndexToRemove,
+        [switch] $Purge
     )
     $updatedTodo = @()
     for ($i = 0; $i -lt $TodoItems.Count; $i++) {
         if ($i -ne $ItemIndexToRemove) {$updatedTodo += $TodoItems[$i]}
-        else {New-TodoCompleted -Item $TodoItems[$i] -Path (Get-DonePath $Path)}
+        elseif (($i -eq $ItemIndexToRemove) -and (!$Purge.IsPresent)) {
+            New-TodoCompleted -Item $TodoItems[$i] -Path (Get-DonePath $Path)
+        }
     }
     return $updatedTodo
 }
