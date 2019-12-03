@@ -145,17 +145,16 @@ function done {
     )
     if (!(Test-Path $Path)) {return "done file not found in '$Path'"}
     $doneItems = Get-Content $Path
-    $params = Get-DoneByDateParams $Specifier1 $Specifier2 -DoneItems $doneItems
-    Get-DoneByDate @params | Select-Object -Last $Tail
+    $params = Get-DoneByDateParams $Specifier1 $Specifier2
+    Get-DoneByDate @params -DoneItems $doneItems | Select-Object -Last $Tail
 }
 
 function Get-DoneByDateParams {
     Param(
         [string] $Specifier1,
-        [string] $Specifier2,
-        [string[]] $DoneItems
+        [string] $Specifier2
     )
-    $params = @{DoneItems = $doneItems}
+    $params = @{}
     switch ($Specifier1) {
         "yesterday" { $params.Date = (Get-Date).AddDays(-1) | Get-Date -Format yyyy-MM-dd }
         "today" { $params.Date = Get-Date -Format yyyy-MM-dd }
