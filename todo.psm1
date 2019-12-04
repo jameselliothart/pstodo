@@ -129,6 +129,10 @@ function New-TodoCompleted {
 function done {
     [CmdletBinding(DefaultParameterSetName = 'TailNumber')]
     Param(
+        [Parameter(Position = 0, ParameterSetName = 'TailNumber')]
+        [ValidateRange(1, [int]::MaxValue)]
+        [int] $Tail = [int]::MaxValue,
+
         [Parameter(Position = 0, ParameterSetName = 'NaturalLanguage')]
         [ValidateSet('yesterday', 'today', 'last', 'this')]
         [string] $Specifier1,
@@ -136,10 +140,6 @@ function done {
         [Parameter(Position = 1, ParameterSetName = 'NaturalLanguage')]
         [ValidateSet('week', 'month')]
         [string] $Specifier2 = 'week',
-
-        [Parameter(Position = 0, ParameterSetName = 'TailNumber')]
-        [ValidateRange(1, [int]::MaxValue)]
-        [int] $Tail = [int]::MaxValue,
 
         [string] $Path = "$(Get-TodoPath)/todo.done.txt"
     )
