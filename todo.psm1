@@ -151,6 +151,7 @@ function done {
 
 function Get-DoneByDateParams {
     Param(
+        [ValidateSet('', 'yesterday', 'today', 'week')]
         [string] $Specifier1,
         [string] $Specifier2
     )
@@ -158,22 +159,34 @@ function Get-DoneByDateParams {
     switch ($Specifier1) {
         "yesterday" { $params.Date = (Get-Date).AddDays(-1) | Get-Date -Format yyyy-MM-dd }
         "today" { $params.Date = Get-Date -Format yyyy-MM-dd }
-        {$_ -in "this","last"} {
-            $addTime = @{this = @{week = 0; month = 0}; last = @{week = -7; month = -1}}
-            $date = @{
-                week = (Get-Date).AddDays($addTime[$Specifier1][$Specifier2])
-                month = (Get-Date).AddMonths($addTime[$Specifier1][$Specifier2])
-            }
-            switch ($Specifier2) {
-                "week" { 
-                    $params.WeekNumber = [int]($date[$Specifier2] | Get-Date -UFormat %V)
+        "week" {
+            if ($Specifier2 -eq 'this') {$params.Date = Get-Date -UFormat %V}
+            elseif ($Specifier2 -eq 'last') {$params.Date = (Get-Date).AddDays(-7) | Get-Date -UFormat %V}
+            else {
+                [ref] $numIntervals = 0
+                if ([int]::TryParse($Specifier2, $numIntervals)) {
+                    $params.Date = (Get-Date).AddDays(-7 * $numIntervals.Value) | Get-Date -UFormat %V
+                    $params.DoneSince = $true
                 }
-                "month" {
-                    $params.Date = $date[$Specifier2] | Get-Date -Format yyyy-MM-dd
-                }
-                Default { throw "'$Specifier2' is not a valid Specifier2 parameter" }
+                else {throw "Unable to parse '$Specifier2' into 'this','last', or an integer"}
             }
         }
+        # {$_ -in "this","last"} {
+        #     $addTime = @{this = @{week = 0; month = 0}; last = @{week = -7; month = -1}}
+        #     $date = @{
+        #         week = (Get-Date).AddDays($addTime[$Specifier1][$Specifier2])
+        #         month = (Get-Date).AddMonths($addTime[$Specifier1][$Specifier2])
+        #     }
+        #     switch ($Specifier2) {
+        #         "week" { 
+        #             $params.WeekNumber = [int]($date[$Specifier2] | Get-Date -UFormat %V)
+        #         }
+        #         "month" {
+        #             $params.Date = $date[$Specifier2] | Get-Date -Format yyyy-MM-dd
+        #         }
+        #         Default { throw "'$Specifier2' is not a valid Specifier2 parameter" }
+        #     }
+        # }
         default { $params.Date = '.' }
     }
     return $params

@@ -179,3 +179,45 @@ Describe "Utility Functions" {
         }
     }
 }
+
+Describe 'Get-DoneByDateParams' -Tag 'DoneByDateParams' {
+    It "should return a Date of '.' when no Specifier is given" {
+        $params = Get-DoneByDateParams $foo $bar
+        $params.Date | Should -Be '.'
+    }
+    It "should return today's date in yyyy-MM-dd format when 'today' is specified" {
+        $expected = (Get-Date).AddDays(0) | Get-Date -Format yyyy-MM-dd
+        $params = Get-DoneByDateParams today
+        $params.Date | Should -Be $expected
+        $params = Get-DoneByDateParams today 'something else'
+        $params.Date | Should -Be $expected
+    }
+    It "should return yesterday's date in yyyy-MM-dd format when 'yesterday' is specified" {
+        $expected = (Get-Date).AddDays(-1) | Get-Date -Format yyyy-MM-dd
+        $params = Get-DoneByDateParams yesterday
+        $params.Date | Should -Be $expected
+        $params = Get-DoneByDateParams yesterday 'something else'
+        $params.Date | Should -Be $expected
+    }
+    It "should return this week's week number when 'week this' is specified" {
+        $expected = (Get-Date).AddDays(0) | Get-Date -UFormat %V
+        $params = Get-DoneByDateParams week this
+        $params.Date | Should -Be $expected
+    }
+    It "should return last week's week number when 'week last' is specified" {
+        $expected = (Get-Date).AddDays(-7) | Get-Date -UFormat %V
+        $params = Get-DoneByDateParams week last
+        $params.Date | Should -Be $expected
+    }
+    It "should return the week number from two weeks ago with DoneSince flag when 'week 2' is specified" {
+        $expected = (Get-Date).AddDays(-14) | Get-Date -UFormat %V
+        $params = Get-DoneByDateParams week 2
+        $params.Date | Should -Be $expected
+        $params.DoneSince | Should -Be $true
+    }
+    # It "should return this month's date when 'month this' is specified" {
+    #     $expected = (Get-Date).AddMonths(0) | Get-Date -Format yyyy-MM
+    #     $params = Get-DoneByDateParams month this
+    #     $params.Date | Should -Be $expected
+    # }
+}
