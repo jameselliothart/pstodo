@@ -202,17 +202,17 @@ Describe 'Get-DoneByDateParams' -Tag 'DoneByDateParams' {
     It "should return this week's week number when 'week this' is specified" {
         $expected = (Get-Date).AddDays(0) | Get-Date -UFormat %V
         $params = Get-DoneByDateParams week this
-        $params.Date | Should -Be $expected
+        $params.WeekNumber | Should -Be $expected
     }
     It "should return last week's week number when 'week last' is specified" {
         $expected = (Get-Date).AddDays(-7) | Get-Date -UFormat %V
         $params = Get-DoneByDateParams week last
-        $params.Date | Should -Be $expected
+        $params.WeekNumber | Should -Be $expected
     }
     It "should return the week number from two weeks ago with DoneSince flag when 'week 2' is specified" {
         $expected = (Get-Date).AddDays(-14) | Get-Date -UFormat %V
         $params = Get-DoneByDateParams week 2
-        $params.Date | Should -Be $expected
+        $params.WeekNumber | Should -Be $expected
         $params.DoneSince | Should -Be $true
     }
     # It "should return this month's date when 'month this' is specified" {

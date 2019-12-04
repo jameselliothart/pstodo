@@ -160,12 +160,12 @@ function Get-DoneByDateParams {
         "yesterday" { $params.Date = (Get-Date).AddDays(-1) | Get-Date -Format yyyy-MM-dd }
         "today" { $params.Date = Get-Date -Format yyyy-MM-dd }
         "week" {
-            if ($Specifier2 -eq 'this') {$params.Date = Get-Date -UFormat %V}
-            elseif ($Specifier2 -eq 'last') {$params.Date = (Get-Date).AddDays(-7) | Get-Date -UFormat %V}
+            if ($Specifier2 -eq 'this') {$params.WeekNumber = Get-Date -UFormat %V}
+            elseif ($Specifier2 -eq 'last') {$params.WeekNumber = (Get-Date).AddDays(-7) | Get-Date -UFormat %V}
             else {
                 [ref] $numIntervals = 0
                 if ([int]::TryParse($Specifier2, $numIntervals)) {
-                    $params.Date = (Get-Date).AddDays(-7 * $numIntervals.Value) | Get-Date -UFormat %V
+                    $params.WeekNumber = (Get-Date).AddDays(-7 * $numIntervals.Value) | Get-Date -UFormat %V
                     $params.DoneSince = $true
                 }
                 else {throw "Unable to parse '$Specifier2' into 'this','last', or an integer"}
