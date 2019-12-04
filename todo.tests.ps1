@@ -7,14 +7,17 @@ second
 another"
 
 $mockDone = "[2019-01-09 12:00:00] second week of the year
+[2019-10-01 20:37:55] october one
+[2019-10-02 20:37:55] october two
 [2019-11-11 20:37:55] eleven
 [2019-11-12 20:37:55] twelve
 [2019-11-13 20:37:55] thirteen
 [$((Get-Date).AddDays(-1) | Get-Date -Format yyyy-MM-dd) 20:37:55] yesterday
 [$((Get-Date).AddDays(-1) | Get-Date -Format yyyy-MM-dd) 20:37:55] yesterday as well
-[$(Get-Date -Format yyyy-MM-dd) 20:37:55] today"
+[$((Get-Date).AddDays(0) | Get-Date -Format yyyy-MM-dd) 20:37:55] today"
 $DoneItems = ($mockDone -split '\r?\n')
-$mockDoneDateVariant = "[$((Get-Date).AddMonths(-1) | Get-Date -Format yyyy-MM-dd) 20:37:55] last month
+$mockDoneDateVariant = "[$((Get-Date).AddMonths(-2) | Get-Date -Format yyyy-MM-dd) 20:37:55] two months ago
+[$((Get-Date).AddMonths(-1) | Get-Date -Format yyyy-MM-dd) 20:37:55] last month
 [$((Get-Date).AddDays(-14) | Get-Date -Format yyyy-MM-dd) 20:37:55] two weeks ago
 [$((Get-Date).AddDays(-7) | Get-Date -Format yyyy-MM-dd) 20:37:55] last week one
 [$((Get-Date).AddDays(-7) | Get-Date -Format yyyy-MM-dd) 20:37:55] last week two"
@@ -114,8 +117,12 @@ Describe 'done' {
             done week 2 -Path $donePath | Should -Be $DoneItemsDateVariant.Where({($_ -like "*last week*") -or ($_ -like "*two weeks ago*")})
         }
         It 'should return the items done since last month' {
-            $twoMonthsAgo = (Get-Date).AddMonths(-2) | Get-Date -Format yyyy-MM
-            done month 1 -Path $donePath | Should -Be $DoneItemsDateVariant.Where({(Get-DateFromDoneItem $_) -gt $twoMonthsAgo})
+            $startOfLastMonth = [datetime]((Get-Date).AddMonths(-1) | Get-Date -Format yyyy-MM)
+            done month 1 -Path $donePath | Should -Be $DoneItemsDateVariant.Where({[datetime](Get-DateFromDoneItem $_) -gt $startOfLastMonth})
+        }
+        It 'should return the items done since two months ago' {
+            $startOfTwoMonthsAgo = [datetime]((Get-Date).AddMonths(-2) | Get-Date -Format yyyy-MM)
+            done month 2 -Path $donePath | Should -Be $DoneItemsDateVariant.Where({[datetime](Get-DateFromDoneItem $_) -gt $startOfTwoMonthsAgo})
         }
     }
 }
@@ -137,19 +144,27 @@ Describe "Utility Functions" {
         }
     }
     Context 'Get-DoneByDate' {
-        It 'should return done items from the specified year-month-day' {
+        It 'should return items done in the specified year-month-day' {
             Get-DoneByDate -Date '2019-11-11' -DoneItems $DoneItems | Should -Be $DoneItems.Where({$_ -like '*eleven*'})
         }
-        It 'should return done items from the specified month-day' {
+        It 'should return items done in the specified month-day' {
             Get-DoneByDate -Date '11-11' -DoneItems $DoneItems | Should -Be $DoneItems.Where({$_ -like '*eleven*'})
         }
-        It 'should return done items from the specified week number' {
+        It 'should return items done in the specified year-month' {
+            Get-DoneByDate -Date '2019-10' -DoneItems $DoneItems | Should -Be $DoneItems.Where({$_ -like '*october*'})
+        }
+        It 'should return items done in the specified week number' {
             Get-DoneByDate -WeekNumber 2 -DoneItems $DoneItems | Should -Be '[2019-01-09 12:00:00] second week of the year'
         }
-        It 'should return done items done since the specified week number' {
+        It 'should return items done since the beginning of the specified week number' {
             $twoWeeksAgo = [int]((Get-Date).AddDays(-14) | Get-Date -UFormat %V)
             Get-DoneByDate -DoneSince -WeekNumber $twoWeeksAgo -DoneItems $DoneItemsDateVariant |
                 Should -Be $DoneItemsDateVariant.Where({($_ -like "*last week*") -or ($_ -like "*two weeks ago*")})
+        }
+        It 'should return items done since the beginning of the specified year-month' {
+            $date = '2019-10'
+            Get-DoneByDate -DoneSince -Date $date -DoneItems $DoneItems |
+                Should -Be $DoneItems.Where({[datetime](Get-DateFromDoneItem $_) -gt [datetime]$date})
         }
     }
     Context 'Get-TodoPath' {
