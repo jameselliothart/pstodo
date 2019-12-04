@@ -134,7 +134,7 @@ function done {
         [int] $Tail = [int]::MaxValue,
 
         [Parameter(Position = 0, ParameterSetName = 'NaturalLanguage')]
-        [ValidateSet('', 'yesterday', 'today', 'week')]
+        [ValidateSet('', 'yesterday', 'today', 'week', 'month')]
         [string] $Specifier1,
 
         [Parameter(Position = 1, ParameterSetName = 'NaturalLanguage')]
@@ -150,7 +150,7 @@ function done {
 
 function Get-DoneByDateParams {
     Param(
-        [ValidateSet('', 'yesterday', 'today', 'week')]
+        [ValidateSet('', 'yesterday', 'today', 'week', 'month')]
         [string] $Specifier1,
         [string] $Specifier2
     )
@@ -170,22 +170,18 @@ function Get-DoneByDateParams {
                 else {throw "Unable to parse '$Specifier2' into 'this','last', or an integer"}
             }
         }
-        # {$_ -in "this","last"} {
-        #     $addTime = @{this = @{week = 0; month = 0}; last = @{week = -7; month = -1}}
-        #     $date = @{
-        #         week = (Get-Date).AddDays($addTime[$Specifier1][$Specifier2])
-        #         month = (Get-Date).AddMonths($addTime[$Specifier1][$Specifier2])
-        #     }
-        #     switch ($Specifier2) {
-        #         "week" { 
-        #             $params.WeekNumber = [int]($date[$Specifier2] | Get-Date -UFormat %V)
-        #         }
-        #         "month" {
-        #             $params.Date = $date[$Specifier2] | Get-Date -Format yyyy-MM-dd
-        #         }
-        #         Default { throw "'$Specifier2' is not a valid Specifier2 parameter" }
-        #     }
-        # }
+        "month" {
+            if ($Specifier2 -eq 'this') {$params.Date = Get-Date -Format yyyy-MM}
+            elseif ($Specifier2 -eq 'last') {$params.Date = (Get-Date).AddMonths(-1) | Get-Date -Format yyyy-MM}
+            else {
+                [ref] $numIntervals = 0
+                if ([int]::TryParse($Specifier2, $numIntervals)) {
+                    $params.Date = (Get-Date).AddMonths(-1 * $numIntervals.Value) | Get-Date -Format yyyy-MM
+                    $params.DoneSince = $true
+                }
+                else {throw "Unable to parse '$Specifier2' into 'this','last', or an integer"}
+            }
+        }
         default { $params.Date = '.' }
     }
     return $params

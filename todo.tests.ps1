@@ -99,7 +99,7 @@ Describe 'done' {
         It 'should return the items done last week' {
             done week last -Path $donePath | Should -Be $DoneItemsDateVariant.Where({$_ -like '*last week*'})
         }
-        It 'should return the items done this week' -Skip {
+        It 'should return the items done this week' {
             $weekNumToday = Get-Date | Get-Date -UFormat %V
             $weekNumTwoDaysAgo = (Get-Date).AddDays(-2) | Get-Date -UFormat %V
             if ($weekNumTwoDaysAgo -ne $weekNumToday) {
@@ -113,8 +113,9 @@ Describe 'done' {
         It 'should return done items done since two weeks ago' {
             done week 2 -Path $donePath | Should -Be $DoneItemsDateVariant.Where({($_ -like "*last week*") -or ($_ -like "*two weeks ago*")})
         }
-        It 'should return the items done last month' {
-            done month last -Path $donePath | Should -Be $DoneItemsDateVariant.Where({$_ -like '*last month*'})
+        It 'should return the items done since last month' {
+            $twoMonthsAgo = (Get-Date).AddMonths(-2) | Get-Date -Format yyyy-MM
+            done month 1 -Path $donePath | Should -Be $DoneItemsDateVariant.Where({(Get-DateFromDoneItem $_) -gt $twoMonthsAgo})
         }
     }
 }
@@ -218,9 +219,19 @@ Describe 'Get-DoneByDateParams' -Tag 'DoneByDateParams' {
         $params.WeekNumber | Should -Be $expected
         $params.DoneSince | Should -Be $true
     }
-    # It "should return this month's date when 'month this' is specified" {
-    #     $expected = (Get-Date).AddMonths(0) | Get-Date -Format yyyy-MM
-    #     $params = Get-DoneByDateParams month this
-    #     $params.Date | Should -Be $expected
-    # }
+    It "should return this month's date when 'month this' is specified" {
+        $expected = (Get-Date).AddMonths(0) | Get-Date -Format yyyy-MM
+        $params = Get-DoneByDateParams month this
+        $params.Date | Should -Be $expected
+    }
+    It "should return last month's date when 'month last' is specified" {
+        $expected = (Get-Date).AddMonths(-1) | Get-Date -Format yyyy-MM
+        $params = Get-DoneByDateParams month last
+        $params.Date | Should -Be $expected
+    }
+    It "should return the month from two months ago when 'month 2' is specified" {
+        $expected = (Get-Date).AddMonths(-2) | Get-Date -Format yyyy-MM
+        $params = Get-DoneByDateParams month 2
+        $params.Date | Should -Be $expected
+    }
 }
