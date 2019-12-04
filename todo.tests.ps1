@@ -111,7 +111,6 @@ Describe 'done' {
             }
         }
         It 'should return done items done since two weeks ago' {
-            # $twoWeeksAgo = [int]((Get-Date).AddDays(-14) | Get-Date -UFormat %V)
             done week 2 -Path $donePath | Should -Be $DoneItemsDateVariant.Where({($_ -like "*last week*") -or ($_ -like "*two weeks ago*")})
         }
         It 'should return the items done last month' {
