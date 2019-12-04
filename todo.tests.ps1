@@ -97,7 +97,7 @@ Describe 'done' {
         BeforeEach {Set-Content $donePath -Value $mockDoneDateVariant -Force}
         AfterEach {if (Test-Path $donePath) {Remove-Item $donePath}}
         It 'should return the items done last week' {
-            done last week -Path $donePath | Should -Be $DoneItemsDateVariant.Where({$_ -like '*last week*'})
+            done week last -Path $donePath | Should -Be $DoneItemsDateVariant.Where({$_ -like '*last week*'})
         }
         It 'should return the items done this week' -Skip {
             $weekNumToday = Get-Date | Get-Date -UFormat %V
@@ -107,11 +107,11 @@ Describe 'done' {
             }
             else {
                 $expected = {($_ -like '*today*') -or ($_ -like '*yesterday*') -or ($_ -like '*two days ago*')}
-                done this week -Path $donePath | Should -Be $DoneItemsDateVariant.Where($expected)
+                done week this -Path $donePath | Should -Be $DoneItemsDateVariant.Where($expected)
             }
         }
         It 'should return the items done last month' {
-            done last month -Path $donePath | Should -Be $DoneItemsDateVariant.Where({$_ -like '*last month*'})
+            done month last -Path $donePath | Should -Be $DoneItemsDateVariant.Where({$_ -like '*last month*'})
         }
     }
 }

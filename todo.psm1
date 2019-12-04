@@ -134,12 +134,11 @@ function done {
         [int] $Tail = [int]::MaxValue,
 
         [Parameter(Position = 0, ParameterSetName = 'NaturalLanguage')]
-        [ValidateSet('yesterday', 'today', 'last', 'this')]
+        [ValidateSet('', 'yesterday', 'today', 'week')]
         [string] $Specifier1,
 
         [Parameter(Position = 1, ParameterSetName = 'NaturalLanguage')]
-        [ValidateSet('week', 'month')]
-        [string] $Specifier2 = 'week',
+        [string] $Specifier2,
 
         [string] $Path = "$(Get-TodoPath)/todo.done.txt"
     )
