@@ -249,4 +249,8 @@ Describe 'Get-DoneByDateParams' -Tag 'DoneByDateParams' {
         $params = Get-DoneByDateParams month 2
         $params.Date | Should -Be $expected
     }
+    It "should throw when given Specifier2 which is not 'this','last', or an integer" {
+        {Get-DoneByDateParams week 'asdf'} | Should -Throw
+        {Get-DoneByDateParams month 'asdf'} | Should -Throw
+    }
 }
