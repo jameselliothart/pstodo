@@ -11,6 +11,49 @@ The purpose of this module is to solve two problems:
 
 Thus, the todo module consists of only a single file, `todo.psm1`, so that its contents can be copy/pasted into a recognized PowerShell module directory and used immediately.
 
+## Functionality
+
+First running `todo` will create an empty todo list in the configured todo directory (see Configuration below).
+
+```powershell
+PS > todo
+New todo file created in /home/james/todo.txt
+No todos in /home/james/todo.txt!
+```
+
+Add todo items with `todo a 'some item'`:
+
+```powershell
+PS > todo a 'update readme'      
+0. update readme
+PS > todo a 'push changes to remote'
+0. push changes to remote
+1. update readme
+```
+
+Remove items with `todo r {index}`:
+
+```powershell
+PS > todo r 1
+0. push changes to remote
+```
+
+Removed items are automatically timestamped and added to a todo.done.txt file in the same directory as todo.txt which can be queried with `done`:
+
+```powershell
+PS > done
+[2019-12-23 20:41:16] update readme
+```
+
+To avoid adding to the done file, specify the `-Purge` option when removing, e.g. `todo r 1 -Purge`
+
+`done` accepts a number of options to query by completed date, such as:
+
+* `done today`
+* `done yesterday`
+* `done week this` 
+* `done week 2` (done within the last two weeks)
+
 ## Installation
 
 For PowerShell to load `todo` automatically, all that is required is to place the `todo.psm1` file in a folder named todo in one of the recognized PowerShell module paths (the entire repo can be clone there if desired). Use the command below to find the recognized PowerShell module paths across platforms:
@@ -25,8 +68,6 @@ PS > $env:PSModulePath.Split(';').Split(':')
 For instance, for my output above, the required structure within `/home/james/.local/share/powershell/Modules` is:
 
 ```sh
-$ cd /home/james/.local/share/powershell/Modules
-$ tree
 .
 └── todo
     ├── todo.psm1
@@ -35,8 +76,6 @@ $ tree
 This would also be fine (entire repo contents):
 
 ```sh
-$ cd /home/james/.local/share/powershell/Modules
-$ tree
 .
 └── todo
     ├── README.md
@@ -55,7 +94,15 @@ The test suite in `todo.tests.ps1` is implemented with Pester. For more informat
 
 By default, `todo` places the todo.txt and todo.done.txt files in the `$HOME` environment variable path (typically /home/username on Linux or C:\Users\username on Windows). 
 
-The default behavior can be overridden by placing a todoConfig.json file in the module folder (an example todoConfig.template.json is provided). **Remember to escape backslashes** if specifying a Windows basePath (e.g. `"C:\\todo\\path"`). PowerShell will also accept forward slashes in a Windows environment, so `"C:/todo/path"` will also work.
+The default behavior can be overridden by placing a todoConfig.json file in the module folder (an example todoConfig.template.json is provided). **Remember to escape backslashes** if specifying a Windows basePath (e.g. `"C:\\todo\\path"`). PowerShell will also accept forward slashes in a Windows environment, so `"C:/todo/path"` will also work and is recommended.
+
+
+```sh
+.
+└── todo
+    ├── todoConfig.json
+    ├── todo.psm1
+```
 
 *# todoConfig.json:*
 ```json
