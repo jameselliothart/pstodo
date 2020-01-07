@@ -192,7 +192,7 @@ function Get-DoneByDate {
         [Parameter(Position = 0, ParameterSetName = 'Date')]
         [string] $Date,
         [Parameter(Position = 0, ParameterSetName = 'WeekNumber')]
-        [ValidateRange(1, 52)]
+        [ValidateRange(1, 53)]
         [int] $WeekNumber,
         [switch] $DoneSince,
         [string[]] $DoneItems
