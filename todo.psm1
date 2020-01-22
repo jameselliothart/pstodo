@@ -217,7 +217,7 @@ function Get-DoneByDate {
 
 function Get-DateFromDoneItem {
     Param([string] $DoneItem)
-    [regex]::Match($DoneItem,'^\[(?<datetime>.+)\]').Groups['datetime'].Value
+    [regex]::Match($DoneItem,'^\[(?<datetime>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\]').Groups['datetime'].Value
 }
 
 # Export-ModuleMember -Function todo, done
