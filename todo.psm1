@@ -205,14 +205,22 @@ function Get-DoneByDate {
             $DoneItems | Where-Object {$_ -match $matchString}
         }
         'WeekNumber' {
-            $where = (
-                {[int](Get-DateFromDoneItem $_ | Get-Date -UFormat %V) -eq $WeekNumber -and ((Get-DateFromDoneItem $_ | Get-Date).Year -eq (Get-Date).Year)},
-                {[int](Get-DateFromDoneItem $_ | Get-Date -UFormat %V) -ge $WeekNumber -and ((Get-DateFromDoneItem $_ | Get-Date).Year -eq (Get-Date).Year)}
-            )
-            $DoneItems | Where-Object $where[$DoneSince.IsPresent]
+            $DoneItems | Where-Object {Test-WeekNumber -DoneItemDate (Get-DateFromDoneItem $_) -WeekNumber $WeekNumber -Since:$DoneSince}
         }
         Default { throw "Parameter set not recognized: $parameterSet" }
     }
+}
+
+function Test-WeekNumber {
+    Param(
+        [string] $DoneItemDate,
+        [int] $WeekNumber,
+        [switch] $Since
+    )
+    $doneWeekNumber = [int]($DoneItemDate | Get-Date -UFormat %V)
+    $doneYear = ($DoneItemDate | Get-Date).Year
+    $weekNumberCompare = (($doneWeekNumber -eq $WeekNumber), ($doneWeekNumber -ge $WeekNumber))[$Since.IsPresent]
+    return $weekNumberCompare -and ($doneYear -eq (Get-Date).Year)
 }
 
 function Get-DateFromDoneItem {
