@@ -140,7 +140,7 @@ Describe "Utility Functions" {
     Context 'Get-DateFromDoneItem' {
         $doneItem = '[2019-11-19 20:37:55] nineteen'
         It 'should parse the date from a done item' {
-            Get-DateFromDoneItem -DoneItem $doneItem | Should -Be '2019-11-19 20:37:55'
+            Get-DateFromDoneItem -DoneItem $doneItem | Should -Be ([datetime]'2019-11-19 20:37:55')
         }
     }
     Context 'Get-DoneByDate' {

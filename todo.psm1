@@ -213,19 +213,20 @@ function Get-DoneByDate {
 
 function Test-WeekNumber {
     Param(
-        [string] $DoneItemDate,
+        [datetime] $DoneItemDate,
         [int] $WeekNumber,
         [switch] $Since
     )
     $doneWeekNumber = [int]($DoneItemDate | Get-Date -UFormat %V)
-    $doneYear = ($DoneItemDate | Get-Date).Year
     $weekNumberCompare = (($doneWeekNumber -eq $WeekNumber), ($doneWeekNumber -ge $WeekNumber))[$Since.IsPresent]
-    return $weekNumberCompare -and ($doneYear -eq (Get-Date).Year)
+    return $weekNumberCompare -and ($DoneItemDate.Year -eq (Get-Date).Year)
 }
 
 function Get-DateFromDoneItem {
     Param([string] $DoneItem)
-    [regex]::Match($DoneItem,'^\[(?<datetime>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\]').Groups['datetime'].Value
+    
+    $dateMatch = '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})'
+    return [datetime][regex]::Match($DoneItem,"^\[(?<datetime>$dateMatch\]").Groups['datetime'].Value
 }
 
 # Export-ModuleMember -Function todo, done
