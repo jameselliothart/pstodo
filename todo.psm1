@@ -202,7 +202,12 @@ function Get-DoneByDate {
         'Date' {
             $regexDate = $Date.Replace('-','\-')
             $matchString = "^\[.*$regexDate.*\d{2}:\d{2}:\d{2}\].+"
-            $DoneItems | Where-Object {$_ -match $matchString}
+            if ($DoneSince.IsPresent) {
+                $DoneItems | Where-Object {(Get-DateFromDoneItem $_) -gt [datetime]$Date}
+            }
+            else {
+                $DoneItems | Where-Object {$_ -match $matchString}
+            }
         }
         'WeekNumber' {
             $DoneItems | Where-Object {Test-WeekNumber -DoneItemDate (Get-DateFromDoneItem $_) -WeekNumber $WeekNumber -Since:$DoneSince}
