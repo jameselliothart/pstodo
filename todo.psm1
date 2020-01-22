@@ -96,7 +96,7 @@ function Get-DonePath {
     $parent = $Path | Split-Path
     $parts = ($Path | Split-Path -Leaf).Split('.')
     $name = $parts[0..($parts.Count - 2)]
-    $doneName = ($name, 'done', $parts[-1] | %{$_}) -join '.'
+    $doneName = ($name, 'done', $parts[-1] | ForEach-Object{$_}) -join '.'
     Join-Path $parent $doneName
 }
 
