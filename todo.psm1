@@ -229,7 +229,7 @@ function Test-WeekNumber {
 
 function Get-DateFromDoneItem {
     Param([string] $DoneItem)
-    
+
     $dateMatch = '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})'
     return [datetime][regex]::Match($DoneItem,"^\[(?<datetime>$dateMatch\]").Groups['datetime'].Value
 }
