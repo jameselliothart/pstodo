@@ -6,7 +6,7 @@ $mockTodo = "first
 second
 another"
 
-$mockDone = "[2019-01-09 12:00:00] second week of the year
+$mockDone = "[$((Get-Date).Year)-01-09 12:00:00] second week of the year
 [2019-10-01 20:37:55] october one
 [2019-10-02 20:37:55] october two
 [2019-11-11 20:37:55] eleven
@@ -154,7 +154,7 @@ Describe "Utility Functions" {
             Get-DoneByDate -Date '2019-10' -DoneItems $DoneItems | Should -Be $DoneItems.Where({$_ -like '*october*'})
         }
         It 'should return items done in the specified week number' {
-            Get-DoneByDate -WeekNumber 2 -DoneItems $DoneItems | Should -Be '[2019-01-09 12:00:00] second week of the year'
+            Get-DoneByDate -WeekNumber 2 -DoneItems $DoneItems | Should -Be "[$((Get-Date).Year)-01-09 12:00:00] second week of the year"
         }
         It 'should return items done since the beginning of the specified week number' {
             $twoWeeksAgo = [int]((Get-Date).AddDays(-14) | Get-Date -UFormat %V)

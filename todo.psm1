@@ -206,8 +206,8 @@ function Get-DoneByDate {
         }
         'WeekNumber' {
             $where = (
-                {[int](Get-DateFromDoneItem $_ | Get-Date -UFormat %V) -eq $WeekNumber},
-                {[int](Get-DateFromDoneItem $_ | Get-Date -UFormat %V) -ge $WeekNumber}
+                {[int](Get-DateFromDoneItem $_ | Get-Date -UFormat %V) -eq $WeekNumber -and ((Get-DateFromDoneItem $_ | Get-Date).Year -eq (Get-Date).Year)},
+                {[int](Get-DateFromDoneItem $_ | Get-Date -UFormat %V) -ge $WeekNumber -and ((Get-DateFromDoneItem $_ | Get-Date).Year -eq (Get-Date).Year)}
             )
             $DoneItems | Where-Object $where[$DoneSince.IsPresent]
         }
